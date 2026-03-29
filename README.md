@@ -1,126 +1,219 @@
-```markdown
-# PerkPilotBot 🤖
+PerkPilotBot 🤖
 
-PerkPilotBot is a command-line chatbot built with the Google Gemini API. It helps students find relevant discounts and government scholarships by scraping various web sources and storing the information in a local SQLite database.
+PerkPilotBot is a command-line AI chatbot designed to help students discover relevant discounts and government scholarships. It leverages web scraping techniques and integrates with the Google Gemini API to provide intelligent, data-driven responses.
 
-## 🚀 How It Works
+🚀 Overview
 
-The project operates in two main phases:
+PerkPilotBot automates the process of collecting and querying student benefits by:
 
-1.  **Data Collection (Scraping):**
-    * Python scripts use `BeautifulSoup` and `Selenium` to scrape data from multiple websites.
-    * `web scrape.py` gathers student discounts from **MyUNIDAYS** (using `requests` and `BeautifulSoup`) and **Student Beans** (using `Selenium` for dynamic content).
-    * `govt scholarships scrap.py` gathers scholarship information from India's **National Scholarship Portal** (`scholarships.gov.in`).
-    * All collected data is cleaned and stored in a local SQLite database (`student_discounts.db`) in two separate tables: `discounts` and `govt_scholarships`.
+Scraping data from multiple trusted platforms
+Storing structured data locally in a SQLite database
+Using an LLM (Gemini) to generate contextual responses based strictly on collected data
+⚙️ System Architecture
 
-2.  **Chatbot Interaction (AI):**
-    * The main `student_discounts_bot.py` script runs the chatbot.
-    * It first loads all discount and scholarship data from the `student_discounts.db` database.
-    * It asks the user if they are looking for **Discounts** or **Scholarships**.
-    * Based on the user's query, it dynamically creates a large prompt for the **Google Gemini API** ("gemini-1.5-flash"). This prompt includes the *entire set* of relevant data (either all discounts or all scholarships) and instructs the AI to answer *only* using that data.
-    * The bot then prints the AI's generated, helpful response.
+The project operates in two primary phases:
 
-## 🛠️ Technologies Used
+1. Data Collection (Web Scraping)
+Python scripts extract data from various sources:
+MyUNIDAYS → via requests and BeautifulSoup
+Student Beans → via Selenium (handles dynamic content)
+National Scholarship Portal (India) → scholarship data extraction
+Scripts involved:
+web scrape.py → collects student discounts
+govt scholarships scrap.py → collects government scholarships
+Data Processing:
+Cleaned and structured before storage
+Stored in student_discounts.db (SQLite database)
+Database Schema:
+discounts table
+govt_scholarships table
+2. Chatbot Interaction (AI Layer)
+Main script: student_discounts_bot.py
 
-* **AI:** Google Gemini API (`google-generativeai`)
-* **Web Scraping:** Selenium, BeautifulSoup4, Requests
-* **Database:** SQLite3
-* **Language:** Python
+Workflow:
 
-## 📁 File Structure
+Loads data from SQLite database
+Prompts user to choose:
+Discounts
+Scholarships
+Constructs a dynamic prompt including relevant dataset
+Sends prompt to Gemini (gemini-1.5-flash)
+Returns a response constrained strictly to available data
+🛠️ Tech Stack
+Component	Technology Used
+AI Model	Google Gemini API (google-generativeai)
+Web Scraping	Selenium, BeautifulSoup4, Requests
+Database	SQLite3
+Programming	Python
+📁 Project Structure
+PerkPilotBot/
+│
+├── student_discounts_bot.py     # Main chatbot script
+├── web scrape.py                # Scrapes student discounts
+├── govt scholarships scrap.py   # Scrapes government scholarships
+├── student_discounts.db         # SQLite database (generated after scraping)
+├── print database contents.py   # Debugging utility
+├── websites.txt                 # Source URLs reference
+└── README.md                    # Project documentation
+⚙️ Setup Instructions
+1. Prerequisites
 
-```
+Ensure the following are installed:
 
-.
-├── student\_discounts\_bot.py  \# The main chatbot script that interacts with the user and Gemini API.
-├── web scrape.py             \# Script to scrape student discounts from MyUNIDAYS and Student Beans.
-├── govt scholarships scrap.py  \# Script to scrape scholarships from scholarships.gov.in.
-├── student\_discounts.db      \# SQLite database where all scraped data is stored.
-├── print database contents.py  \# A helper script to print database contents (for debugging).
-├── websites.txt              \# A reference file containing the source URLs.
-└── README.md                 \# This file.
+Python 3.x
+Google Chrome
+Chrome WebDriver (matching your Chrome version)
+2. Installation
 
-````
+Clone the repository:
 
-## ⚙️ Setup and Usage
+git clone <your-repo-url>
+cd PerkPilotBot
 
-Follow these steps to run the project locally.
+Create a requirements.txt file:
 
-### 1. Prerequisites
+google-generativeai
+requests
+beautifulsoup4
+selenium
 
-* Python 3.x
-* Google Chrome (for Selenium)
-* Chrome WebDriver (must match your Chrome version)
+Install dependencies:
 
-### 2. Installation
+pip install -r requirements.txt
+3. Configure API Key
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repo-url>
-    cd PerkPilotBot
-    ```
+Set your Google Gemini API key as an environment variable:
 
-2.  **Create a `requirements.txt` file** with the following content:
-    ```
-    google-generativeai
-    requests
-    beautifulsoup4
-    selenium
-    ```
+macOS/Linux:
 
-3.  **Install the dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-### 3. Set Up Google API Key
-
-You must set your Google API key as an environment variable.
-
-**On macOS/Linux:**
-```bash
 export GOOGLE_API_KEY="your_api_key_here"
-````
 
-**On Windows (Command Prompt):**
+Windows (Command Prompt):
 
-```bash
 set GOOGLE_API_KEY="your_api_key_here"
-```
 
-**On Windows (PowerShell):**
+Windows (PowerShell):
 
-```bash
 $env:GOOGLE_API_KEY="your_api_key_here"
-```
+4. Running the Application
+Step 1: Populate Database
 
-### 4\. Running the Project
+Run scraping scripts:
 
-1.  **Populate the Database:**
-    You must run the scraping scripts first to create and fill the `student_discounts.db` file.
+python "govt scholarships scrap.py"
+python "web scrape.py"
 
-    ```bash
-    python "govt scholarships scrap.py"
-    python "web scrape.py"
-    ```
+Note: The Selenium script may take a few minutes due to dynamic page loading.
 
-    *Note: The `web scrape.py` script using Selenium may take a few minutes to run as it scrolls to load all data.*
+Step 2: Start Chatbot
+python student_discounts_bot.py
+Step 3: Interact
 
-2.  **Run the Chatbot:**
-    Once the database is populated, you can start the bot.
+Example prompt:
 
-    ```bash
-    python student_discounts_bot.py
-    ```
+Hi Student! Welcome to PerkPilotBot.
+What are you looking for?
+[1) Discounts  2) Government Scholarships/Schemes]
+📌 Key Features
+End-to-end pipeline: scraping → storage → AI querying
+Context-aware chatbot powered by Gemini
+Strict data grounding (no hallucinated responses)
+Modular and extensible architecture
+🚧 Potential Improvements
+Replace SQLite with a scalable database (PostgreSQL / MongoDB)
+Add semantic search instead of full prompt injection
+Deploy as a web app (Flask / FastAPI)
+Schedule automated scraping pipelines
+Implement vector database (FAISS / Pinecone) for better retrieval
 
-3.  **Interact with the Bot:**
-    The bot will greet you and ask what you're looking for.
+If you want, I can also:
 
-    ```
-    Hi Student! Welcome to PerkPilotBot. What are you looking for [1) Discounts 2) Government Scholarships/Schemes]?
-    ```
+Make this README resume-ready (short + impact focused)
+Convert it into a GitHub portfolio highlight section
+Add architecture diagram + flowchart for better presentation
 
-<!-- end list -->
+Just tell me.
 
-```
-```
+make it for github readme style 
+
+Here is a clean, GitHub-ready README with proper formatting, badges, structure, and concise sections (optimized for recruiters and quick scanning):
+
+🤖 PerkPilotBot
+
+AI-powered CLI chatbot to discover student discounts and government scholarships using web scraping + Google Gemini
+
+🚀 Features
+🔍 Scrapes student discounts from multiple platforms
+🎓 Extracts government scholarships from official portals
+🤖 AI-powered chatbot (Google Gemini) for smart responses
+💾 Local SQLite database for fast retrieval
+⚡ Fully command-line based, lightweight, and modular
+🧠 How It Works
+1. Data Collection
+Scrapes data using:
+BeautifulSoup + requests → static websites
+Selenium → dynamic content
+Sources include:
+Student discount platforms
+Government scholarship portals
+Stores cleaned data in SQLite:
+discounts table
+govt_scholarships table
+2. AI Chatbot
+Loads data from database
+Prompts user for:
+Discounts OR Scholarships
+Injects relevant dataset into prompt
+Uses Google Gemini (gemini-1.5-flash)
+Ensures responses are strictly grounded in scraped data
+🛠️ Tech Stack
+Language: Python
+AI: Google Gemini API (google-generativeai)
+Web Scraping: Selenium, BeautifulSoup, Requests
+Database: SQLite
+📁 Project Structure
+PerkPilotBot/
+│── student_discounts_bot.py      # Main chatbot
+│── web scrape.py                 # Discount scraper
+│── govt scholarships scrap.py    # Scholarship scraper
+│── student_discounts.db          # Database (generated)
+│── print database contents.py    # Debug utility
+│── websites.txt                  # Source references
+│── README.md
+⚙️ Setup
+1. Clone Repo
+git clone <your-repo-url>
+cd PerkPilotBot
+2. Install Dependencies
+pip install google-generativeai requests beautifulsoup4 selenium
+3. Set API Key
+# Linux / macOS
+export GOOGLE_API_KEY="your_api_key"
+
+# Windows (CMD)
+set GOOGLE_API_KEY="your_api_key"
+
+# Windows (PowerShell)
+$env:GOOGLE_API_KEY="your_api_key"
+▶️ Usage
+Step 1: Run Scrapers
+python "govt scholarships scrap.py"
+python "web scrape.py"
+Step 2: Start Chatbot
+python student_discounts_bot.py
+Step 3: Example Interaction
+Hi Student! Welcome to PerkPilotBot.
+What are you looking for?
+1) Discounts
+2) Government Scholarships/Schemes
+✨ Highlights
+End-to-end pipeline: Scraping → Storage → AI Querying
+Real-world use case for students
+LLM grounded responses (no hallucination)
+Clean modular structure
+🚧 Future Improvements
+🌐 Web app deployment (Flask / FastAPI)
+🔎 Semantic search (FAISS / vector DB)
+⏱️ Scheduled scraping automation
+🗄️ Upgrade to PostgreSQL / MongoDB
+📊 Add filtering & ranking system
